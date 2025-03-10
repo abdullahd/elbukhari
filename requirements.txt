@@ -1,5 +1,6 @@
 Django>=5.1,<5.2
 wagtail>=6.4,<6.5
+wagtailmedia==0.15.2
 
 dj-database-url==2.3
 psycopg[binary]>=3.2,<3.3
