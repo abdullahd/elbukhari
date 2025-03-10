@@ -1,0 +1,13 @@
+<div class="document-block">
+    {% if self.title %}<h3>{{ self.title }}</h3>{% endif %}
+    
+    <a href="{{ self.document.url }}" target="_blank" class="document-link">
+        <i class="fa fa-file-pdf-o"></i> {{ self.document.title }}
+    </a>
+    
+    {% if self.description %}
+    <div class="description">
+        {{ self.description }}
+    </div>
+    {% endif %}
+</div> 

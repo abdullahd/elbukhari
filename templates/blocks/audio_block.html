@@ -1,0 +1,21 @@
+<div class="audio-block">
+    {% if self.title %}<h3>{{ self.title }}</h3>{% endif %}
+    
+    {% if self.audio_file.file %}
+    <audio controls>
+        <source src="{{ self.audio_file.file.url }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    {% elif self.audio_url %}
+    <audio controls>
+        <source src="{{ self.audio_url }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    {% endif %}
+    
+    {% if self.description %}
+    <div class="description">
+        {{ self.description }}
+    </div>
+    {% endif %}
+</div> 

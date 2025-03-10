@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card mt-5 mb-5">
+                <div class="card-body">
+                    <i class="fa fa-envelope fa-4x text-success mb-3"></i>
+                    <h2>{% trans "Thank You for Subscribing" %}</h2>
+                    <p class="lead">{% trans "Please check your email to confirm your subscription." %}</p>
+                    <p>{% trans "We've sent a confirmation email to your inbox. Please click the link in the email to confirm your subscription." %}</p>
+                    <p class="text-muted">{% trans "If you don't see the email, please check your spam folder." %}</p>
+                    <a href="/" class="btn btn-primary mt-3">{% trans "Return to Homepage" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
