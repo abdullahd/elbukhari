@@ -444,74 +444,57 @@ class SocialMedia(models.Model):
 
 
 class ListingPage(Page):
-    """Abstract base class for all listing pages"""
+    """Base listing page for different content types"""
     intro = RichTextField(blank=True)
+    items_per_page = models.IntegerField(default=10)
     
     content_panels = Page.content_panels + [
         FieldPanel('intro'),
+        FieldPanel('items_per_page'),
     ]
     
-    class Meta:
-        abstract = True
+    def get_items(self):
+        """Override this method to return the appropriate queryset"""
+        return []
     
-    def get_context(self, request, *args, **kwargs):
-        context = super().get_context(request, *args, **kwargs)
+    def filter_by_search(self, queryset, search_term):
+        """Override this method to apply search filtering"""
+        return queryset
+    
+    def get_context(self, request):
+        context = super().get_context(request)
         
-        # Get all instances of the content type
+        # Get base queryset
         items = self.get_items()
         
-        # Filter by tag if specified
-        tag = request.GET.get('tag')
-        if tag:
-            items = items.filter(tags__name=tag)
+        # Filter by masjid
+        masjid_id = request.GET.get('masjid')
+        if masjid_id:
+            try:
+                items = items.filter(masjid_id=int(masjid_id))
+            except (ValueError, TypeError):
+                pass
         
-        # Handle search query
-        search_query = request.GET.get('q', None)
-        if search_query:
-            items = self.filter_by_search(items, search_query)
-            
-        # Sort items
-        sort = request.GET.get('sort', '-date')
-        if sort:
-            if sort == 'title':
-                items = items.order_by('title')
-            elif sort == '-title':
-                items = items.order_by('-title')
-            elif sort == 'date':
-                items = items.order_by('date')
-            elif sort == '-date':
-                items = items.order_by('-date')
-            elif sort == 'hits':
-                items = items.order_by('-hits')
+        # Filter by search
+        search = request.GET.get('search')
+        if search:
+            items = self.filter_by_search(items, search)
         
         # Pagination
         page = request.GET.get('page')
-        paginator = Paginator(items, 12)  # 12 items per page
+        paginator = Paginator(items, self.items_per_page)
         try:
             items = paginator.page(page)
         except PageNotAnInteger:
             items = paginator.page(1)
         except EmptyPage:
             items = paginator.page(paginator.num_pages)
-            
+        
         context['items'] = items
-        context['search_query'] = search_query
-        context['current_tag'] = tag
-        context['current_sort'] = sort
+        context['search_query'] = search
+        context['masjids'] = Masjid.objects.all()
         
         return context
-    
-    def get_items(self):
-        """Override in child classes to return the proper queryset"""
-        return []
-    
-    def filter_by_search(self, queryset, search_term):
-        """Default search filter using the search_fields"""
-        return queryset.filter(title__icontains=search_term)
-    
-    def serve(self, request):
-        context = self.get_context(request)
-        return render(request, self.template, context)
 
 
 class KhutbahListingPage(ListingPage):

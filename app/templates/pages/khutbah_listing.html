@@ -11,25 +11,7 @@
             <span class="pCounter">عدد المواد الموجودة : <span class="arabic-number">{{ items.paginator.count }}</span></span>
         </header>
         
-        <!-- Add a filter section at the top of the khutbah listing -->
-        <div class="filters mb-4">
-            <form class="form-inline" method="get">
-                <div class="form-group mb-2">
-                    <label for="masjid-filter" class="mr-2">تصفية حسب المسجد:</label>
-                    <select id="masjid-filter" name="masjid" class="form-control" onchange="this.form.submit()">
-                        <option value="">-- جميع المساجد --</option>
-                        {% for masjid in masjids %}
-                            <option value="{{ masjid.id }}" {% if request.GET.masjid == masjid.id|stringformat:"s" %}selected{% endif %}>
-                                {{ masjid|get_masjid_display }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                {% if request.GET.tag %}
-                    <input type="hidden" name="tag" value="{{ request.GET.tag }}">
-                {% endif %}
-            </form>
-        </div>
+
         
         <div class="row">
             <div class="col-lg-12 rowWrap">

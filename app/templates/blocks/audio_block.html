@@ -1,8 +1,13 @@
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags wagtailimages_tags %}
 
 <div class="audio-block">
+    {% if value.title %}
     <h4 class="audio-title">{{ value.title }}</h4>
-    <div class="compact-player" data-url="{{ value.audio_url }}">
+    {% endif %}
+    
+    <div class="compact-player" 
+        {% if value.audio_file %}data-url="{{ value.audio_file.url }}"{% endif %}
+        {% if value.audio_url %}data-url="{{ value.audio_url }}"{% endif %}>
         <div class="play-button">
             <i class="fa-solid fa-play"></i>
         </div>
@@ -11,7 +16,8 @@
             <div class="position-indicator"></div>
         </div>
         <div class="time">0:00 / 0:00</div>
-        <a href="{{ value.audio_url }}" download class="download-button">
+        <a href="{% if value.audio_file %}{{ value.audio_file.url }}{% else %}{{ value.audio_url }}{% endif %}" 
+           download class="download-button">
             <i class="fa-solid fa-download"></i>
         </a>
     </div>
