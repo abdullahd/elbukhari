@@ -5,11 +5,10 @@ from wagtail import hooks
 
 from .models import (
     Khutbah, Mohadarah, Sharhu, Motarjmah, Tilawah, 
-    Book, Article, Announcement, NewsletterSubscriber, SocialMedia
+    Book, Article, Announcement, SocialMedia
 )
 
 # Standard Django Admin Registration
-admin.site.register(NewsletterSubscriber)
 admin.site.register(SocialMedia)
 
 # Define all your admin ViewSets

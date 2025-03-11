@@ -1,0 +1,33 @@
+{% load wagtailcore_tags wagtailmedia_tags %}
+
+<div class="video-block">
+    {% if value.title %}<h3>{{ value.title }}</h3>{% endif %}
+    
+    <div class="video-player">
+        {% if value.video_file %}
+            {% if value.video_file.type == 'video' %}
+                <video controls {% if value.thumbnail %}poster="{% image value.thumbnail fill-800x450 %}"{% endif %}>
+                    <source src="{{ value.video_file.file.url }}" type="{{ value.video_file.file.mime_type }}">
+                    Your browser does not support the video element.
+                </video>
+            {% endif %}
+        {% elif value.video_url %}
+            <div class="embed-responsive embed-responsive-16by9">
+                {% if 'youtube.com' in value.video_url or 'youtu.be' in value.video_url %}
+                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/{{ value.video_url|youtube_id }}" allowfullscreen></iframe>
+                {% else %}
+                    <video controls {% if value.thumbnail %}poster="{% image value.thumbnail fill-800x450 %}"{% endif %}>
+                        <source src="{{ value.video_url }}">
+                        Your browser does not support the video element.
+                    </video>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    
+    {% if value.description %}
+        <div class="video-description">
+            {{ value.description|richtext }}
+        </div>
+    {% endif %}
+</div> 

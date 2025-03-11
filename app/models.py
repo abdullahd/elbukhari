@@ -14,13 +14,13 @@ from wagtail.admin.mail import send_mail
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from wagtail.models import Page
 from django.shortcuts import render
+from wagtailmedia.blocks import AudioChooserBlock, VideoChooserBlock 
+from django import forms
 
 # Define custom blocks for StreamField
 class AudioBlock(StructBlock):
     title = CharBlock(required=False, help_text="Title for this audio")
-    audio_file = StructBlock([
-        ('file', CharBlock(required=False, help_text="Select a audio file from media library")),
-    ], form_classname="wagtailmedia-chooser")
+    audio_file = AudioChooserBlock(required=False, help_text="Select an audio file from media library")
     audio_url = URLBlock(required=False, help_text="Or provide a URL to an external audio file")
     description = RichTextBlock(required=False)
     
@@ -29,11 +29,10 @@ class AudioBlock(StructBlock):
         template = 'blocks/audio_block.html'
         label = 'Audio'
 
+
 class VideoBlock(StructBlock):
     title = CharBlock(required=False, help_text="Title for this video")
-    video_file = StructBlock([
-        ('file', CharBlock(required=False, help_text="Select a video file from media library")),
-    ], form_classname="wagtailmedia-chooser")
+    video_file = VideoChooserBlock(required=False, help_text="Select a video file from media library")
     video_url = URLBlock(required=False, help_text="Or provide a URL to an external video")
     thumbnail = ImageChooserBlock(required=False)
     description = RichTextBlock(required=False)
@@ -42,6 +41,7 @@ class VideoBlock(StructBlock):
         icon = 'media'
         template = 'blocks/video_block.html'
         label = 'Video'
+
 
 class DocumentBlock(StructBlock):
     title = CharBlock(required=False, help_text="Title for this document")
@@ -429,86 +429,6 @@ class SocialMedia(models.Model):
         verbose_name = "Social Media Link"
         verbose_name_plural = "Social Media Links"
         ordering = ['sort_order', 'name']
-
-
-@register_snippet
-class NewsletterSubscriber(models.Model):
-    """Model for storing newsletter subscribers"""
-    email = models.EmailField(
-        _('Email Address'), 
-        max_length=255, 
-        unique=True,
-        validators=[EmailValidator()]
-    )
-    name = models.CharField(_('Name'), max_length=255, blank=True)
-    subscribed_at = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(_('Active'), default=True)
-    
-    # For tracking confirmation
-    confirmed = models.BooleanField(_('Confirmed'), default=False)
-    confirmation_sent_at = models.DateTimeField(blank=True, null=True)
-    confirmation_token = models.CharField(max_length=100, blank=True, null=True, unique=True)
-    
-    # Optional: Track subscriber interests for segmentation
-    INTEREST_CHOICES = [
-        ('khutbah', _('Khutbah')),
-        ('mohadarah', _('Mohadarah')),
-        ('tilawah', _('Tilawah')),
-        ('books', _('Books')),
-        ('announcements', _('Announcements')),
-    ]
-    interests = models.CharField(
-        max_length=255, 
-        blank=True,
-        help_text=_('Comma-separated list of interests')
-    )
-    
-    panels = [
-        FieldPanel('email'),
-        FieldPanel('name'),
-        MultiFieldPanel([
-            FieldPanel('is_active'),
-            FieldPanel('confirmed'),
-            FieldPanel('interests'),
-        ], heading=_("Subscription Details")),
-    ]
-    
-    def __str__(self):
-        return self.email
-    
-    def generate_confirmation_token(self):
-        """Generate a unique token for email confirmation"""
-        import secrets
-        self.confirmation_token = secrets.token_urlsafe(32)
-        self.confirmation_sent_at = timezone.now()
-        self.save(update_fields=['confirmation_token', 'confirmation_sent_at'])
-        return self.confirmation_token
-    
-    def confirm_subscription(self):
-        """Confirm a subscription"""
-        self.confirmed = True
-        self.confirmation_token = None
-        self.save(update_fields=['confirmed', 'confirmation_token'])
-    
-    def send_confirmation_email(self, request=None):
-        """Send confirmation email to the subscriber"""
-        token = self.generate_confirmation_token()
-        confirmation_url = request.build_absolute_uri(
-            f'/newsletter/confirm/{token}/'
-        )
-        
-        subject = _('Confirm your newsletter subscription')
-        message = _(f'Thank you for subscribing to our newsletter. '
-                  f'Please confirm your subscription by clicking the link below:\n\n'
-                  f'{confirmation_url}\n\n'
-                  f'If you did not subscribe to our newsletter, please ignore this email.')
-        
-        send_mail(subject, message, [self.email])
-    
-    class Meta:
-        verbose_name = _('Newsletter Subscriber')
-        verbose_name_plural = _('Newsletter Subscribers')
-        ordering = ['-subscribed_at']
 
 
 class ListingPage(Page):
