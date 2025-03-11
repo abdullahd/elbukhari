@@ -1,181 +1,171 @@
 {% extends "base.html" %}
-{% load wagtailcore_tags wagtailimages_tags %}
+{% load wagtailcore_tags wagtailimages_tags static %}
+
+{% block title %}الخطب | {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <h1>{{ page.title }}</h1>
-            {% if page.intro %}
-                <div class="intro">{{ page.intro|richtext }}</div>
-            {% endif %}
-        </div>
-    </div>
-    
-    <!-- Search and Filter Section -->
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <form action="" method="get" class="search-form">
-                <div class="input-group">
-                    <input type="text" name="q" class="form-control" placeholder="Search khutbahs..." 
-                           value="{{ search_query|default:'' }}">
-                    <div class="input-group-append">
-                        <button class="btn btn-primary" type="submit">Search</button>
-                    </div>
+<div class="row">
+    <div class="col-lg-8 col-md-8">
+        <header class="page-header">
+            <h1 class="page-title">{{ page.title }}</h1>
+            <span class="pCounter">عدد المواد الموجودة : <span class="arabic-number">{{ items.paginator.count }}</span></span>
+        </header>
+        
+        <!-- Add a filter section at the top of the khutbah listing -->
+        <div class="filters mb-4">
+            <form class="form-inline" method="get">
+                <div class="form-group mb-2">
+                    <label for="masjid-filter" class="mr-2">تصفية حسب المسجد:</label>
+                    <select id="masjid-filter" name="masjid" class="form-control" onchange="this.form.submit()">
+                        <option value="">-- جميع المساجد --</option>
+                        {% for masjid in masjids %}
+                            <option value="{{ masjid.id }}" {% if request.GET.masjid == masjid.id|stringformat:"s" %}selected{% endif %}>
+                                {{ masjid|get_masjid_display }}
+                            </option>
+                        {% endfor %}
+                    </select>
                 </div>
+                {% if request.GET.tag %}
+                    <input type="hidden" name="tag" value="{{ request.GET.tag }}">
+                {% endif %}
             </form>
         </div>
-        <div class="col-md-4">
-            <div class="dropdown float-right">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="sortDropdown" 
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Sort by: {% if current_sort == '-date' %}Newest{% elif current_sort == 'date' %}Oldest
-                    {% elif current_sort == 'title' %}Title (A-Z){% elif current_sort == '-title' %}Title (Z-A)
-                    {% elif current_sort == 'hits' %}Most Popular{% else %}Newest{% endif %}
-                </button>
-                <div class="dropdown-menu" aria-labelledby="sortDropdown">
-                    <a class="dropdown-item" href="?{% if search_query %}q={{ search_query }}&{% endif %}
-                                                  {% if current_tag %}tag={{ current_tag }}&{% endif %}
-                                                  sort=-date">Newest</a>
-                    <a class="dropdown-item" href="?{% if search_query %}q={{ search_query }}&{% endif %}
-                                                  {% if current_tag %}tag={{ current_tag }}&{% endif %}
-                                                  sort=date">Oldest</a>
-                    <a class="dropdown-item" href="?{% if search_query %}q={{ search_query }}&{% endif %}
-                                                  {% if current_tag %}tag={{ current_tag }}&{% endif %}
-                                                  sort=title">Title (A-Z)</a>
-                    <a class="dropdown-item" href="?{% if search_query %}q={{ search_query }}&{% endif %}
-                                                  {% if current_tag %}tag={{ current_tag }}&{% endif %}
-                                                  sort=-title">Title (Z-A)</a>
-                    <a class="dropdown-item" href="?{% if search_query %}q={{ search_query }}&{% endif %}
-                                                  {% if current_tag %}tag={{ current_tag }}&{% endif %}
-                                                  sort=hits">Most Popular</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Filter by tags if available -->
-    {% if current_tag %}
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="current-filters">
-                <span class="badge badge-primary">{{ current_tag }} 
-                    <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if current_sort %}sort={{ current_sort }}{% endif %}" 
-                       class="text-white">×</a>
-                </span>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-    
-    <!-- Results count -->
-    <div class="row mb-3">
-        <div class="col-12">
-            <p>Showing {{ items.paginator.count }} result{{ items.paginator.count|pluralize }}</p>
-        </div>
-    </div>
-    
-    <!-- Khutbah Listing -->
-    <div class="row">
-        {% for khutbah in items %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    {% if khutbah.cover_image %}
-                        {% image khutbah.cover_image fill-350x200 as cover_img %}
-                        <img src="{{ cover_img.url }}" alt="{{ khutbah.title }}" class="card-img-top">
-                    {% endif %}
-                    
-                    <div class="card-body">
-                        <h5 class="card-title">{{ khutbah.title }}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">{{ khutbah.get_sermon_type_display }}</h6>
-                        
-                        {% if khutbah.date %}
-                            <p class="card-text">
-                                <small class="text-muted">{{ khutbah.date|date:"F j, Y" }}</small>
-                            </p>
-                        {% endif %}
-                        
-                        {% if khutbah.masjid %}
-                            <p class="card-text">
-                                <i class="fa fa-mosque"></i> {{ khutbah.masjid }}
-                            </p>
-                        {% endif %}
-                        
-                        <div class="card-text">
-                            {% if khutbah.transcript %}
-                                {{ khutbah.transcript|richtext|truncatewords_html:30 }}
-                            {% endif %}
-                        </div>
+        
+        <div class="row">
+            <div class="col-lg-12 rowWrap">
+                {% for khutbah in items %}
+                    <div class="rowFull">
+                        <ul>
+                            <li class="rowNo">{{ forloop.counter }}</li>
+                            <li class="rowName">{{ khutbah.title }}</li>
+                            <li class="rowDate">أضيف : <span class="arabic-date">{{ khutbah.date|date:"d F Y" }}</span></li>
+                            <li class="rowShare">مشاركة :
+                                <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}khutbah/{{ khutbah.id }}/">
+                                    <i class="fa-brands fa-facebook"></i>
+                                </a>
+                                <a target="_blank" href="https://twitter.com/home?status={{ request.build_absolute_uri }}khutbah/{{ khutbah.id }}/">
+                                    <i class="fa-brands fa-twitter"></i>
+                                </a>
+                            </li>
+                            {% for block in khutbah.media_content %}
+                                {% if block.block_type == 'audio' %}
+                                    <li class="rowPlay">
+                                        <div class="compact-player" data-url="{{ block.value.audio_url }}">
+                                            <div class="play-button">
+                                                <i class="fa-solid fa-play"></i>
+                                            </div>
+                                            <div class="progress-container">
+                                                <div class="progress-bar"></div>
+                                                <div class="position-indicator"></div>
+                                            </div>
+                                            <div class="time">0:00 / 0:00</div>
+                                        </div>
+                                    </li>
+                                    <li class="rowDownload">
+                                        <a class="inline-exclude" href="{{ block.value.audio_url }}" download>
+                                            <i class="fa-solid fa-download"></i> تحميل
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
                     </div>
-                    
-                    <div class="card-footer bg-transparent">
-                        <a href="{% url 'khutbah_detail' khutbah.id %}" class="btn btn-primary">View Details</a>
+                {% empty %}
+                    <div class="rowFull">
+                        <p>لا توجد خطب.</p>
                     </div>
-                </div>
+                {% endfor %}
             </div>
-        {% empty %}
-            <div class="col-12">
-                <p>No khutbahs found. Please try a different search.</p>
-            </div>
-        {% endfor %}
-    </div>
-    
-    <!-- Pagination -->
-    {% if items.paginator.num_pages > 1 %}
-    <div class="row mt-4">
-        <div class="col-12">
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center">
+        </div>
+        
+        <!-- Pagination -->
+        <div class="col-lg-12">
+            {% if items.paginator.num_pages > 1 %}
+                <div class="pagination">
                     {% if items.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ items.previous_page_number }}
-                                                     {% if search_query %}&q={{ search_query }}{% endif %}
-                                                     {% if current_tag %}&tag={{ current_tag }}{% endif %}
-                                                     {% if current_sort %}&sort={{ current_sort }}{% endif %}">
-                                Previous
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="page-item disabled">
-                            <span class="page-link">Previous</span>
-                        </li>
+                        <a href="?page={{ items.previous_page_number }}" class="prev">« السابق</a>
                     {% endif %}
                     
                     {% for p in items.paginator.page_range %}
                         {% if items.number == p %}
-                            <li class="page-item active">
-                                <span class="page-link">{{ p }}</span>
-                            </li>
+                            <span class="current arabic-number">{{ p }}</span>
                         {% elif p > items.number|add:'-3' and p < items.number|add:'3' %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ p }}
-                                                         {% if search_query %}&q={{ search_query }}{% endif %}
-                                                         {% if current_tag %}&tag={{ current_tag }}{% endif %}
-                                                         {% if current_sort %}&sort={{ current_sort }}{% endif %}">
-                                    {{ p }}
-                                </a>
-                            </li>
+                            <a href="?page={{ p }}" class="arabic-number">{{ p }}</a>
                         {% endif %}
                     {% endfor %}
                     
                     {% if items.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ items.next_page_number }}
-                                                     {% if search_query %}&q={{ search_query }}{% endif %}
-                                                     {% if current_tag %}&tag={{ current_tag }}{% endif %}
-                                                     {% if current_sort %}&sort={{ current_sort }}{% endif %}">
-                                Next
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="page-item disabled">
-                            <span class="page-link">Next</span>
-                        </li>
+                        <a href="?page={{ items.next_page_number }}" class="next">التالي »</a>
                     {% endif %}
-                </ul>
-            </nav>
+                </div>
+            {% endif %}
         </div>
     </div>
-    {% endif %}
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4 col-md-4 hidden-xs">
+        <div class="row">
+            <div id="sidebar" class="secondary">
+                <div class="col-lg-12">
+                    <div class="bigwidget">
+                        <header>
+                            <h2>محتويات هامة</h2>
+                        </header>
+                        <div class="bigwidgetWrap">
+                            <ul>
+                                {% for item in featured_items %}
+                                    <div class="rowFile">
+                                        <ul>
+                                            <li class="fileIcon"><i class="fa-solid fa-chevron-right"></i></li>
+                                            <li class="fileName"><a href="/khutbah/{{ item.id }}/">{{ item.title }}</a></li>
+                                            <li class="fileCat">{{ item.get_sermon_type_display }}</li>
+                                            {% for block in item.media_content %}
+                                                {% if block.block_type == 'audio' %}
+                                                    <li class="filePlay">
+                                                        <div class="compact-player" data-url="{{ block.value.audio_url }}">
+                                                            <div class="play-button">
+                                                                <i class="fa-solid fa-play"></i>
+                                                            </div>
+                                                            <div class="progress-container">
+                                                                <div class="progress-bar"></div>
+                                                                <div class="position-indicator"></div>
+                                                            </div>
+                                                            <div class="time">0:00 / 0:00</div>
+                                                        </div>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Use a properly scoped initialization function
+    (function() {
+        function initAudioPlayers() {
+            if (typeof ModernPlayer !== 'undefined') {
+                ModernPlayer.init();
+            } else if (typeof CompactPlayer !== 'undefined') {
+                CompactPlayer.init();
+            }
+        }
+        
+        // Add event listener
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initAudioPlayers);
+        } else {
+            initAudioPlayers();
+        }
+    })();
+</script>
 {% endblock %} 

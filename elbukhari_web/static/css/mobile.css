@@ -1,0 +1,138 @@
+@media only screen and (max-width:767px) {
+	body { font-size: 14px !important; }
+	#header {overflow: hidden;}
+	#index { position: absolute; top: 0px; right: 0; left: 0; margin-right: auto; margin-left: auto; 
+-webkit-background-size: cover;
+background-size: cover;
+
+	}
+	.socialHeader { width: 100px; position: absolute; top: 35px; right: 0; left: 0; margin-right: auto; margin-left: auto; }
+	.socialHeader ul li { font-size: 1.5em; }
+	.dateH { position: absolute; top: 15px; right: 0px; width: 300px; left: 0; margin-right: auto; margin-left: auto; text-align: center; }
+	#lastNews { display: none; }
+	.searchGlass { top: 5px; left: 18px; font-size: 1.5em; background-color: rgba(0, 0, 0, 0.2); border-radius: 10px; padding: 3px; }
+	.searchGlass:hover { font-size: 1.5em; background-color: rgba(0, 0, 0, 0.4); }
+	#mobileNav { width: 98%; position: absolute; top: 190px; right: 5px; }
+	#mobileNav select { width: 98%; padding: 10px 10px; border-radius: 5px; font: 1em 'Droid', Arial, sans-serif; }
+	.searchClose { top: 25%; right: 0; left: 0; margin-right: auto; margin-left: auto; }
+	.searchform { width: 80%; margin-top: 50%; }
+	#homeTabs > ul > li { width: 40%; }
+	#lecture .fileName, #lessons .fileName { width: 35%; }
+	#lecture .fileDownload, #lessons .fileDownload { width: 15%; }
+	.logoFooter { display: none; }
+	#footer { overflow: hidden; }
+	.socialFooter { top: 30px; right: auto; left: 0px; width: 120px; z-index: 50000; }
+	.socialFooter ul li { list-style: none; display: block; float: right; }
+	.socialFooter ul li a { display: block; float: right; margin-left: 5px; }
+	.onlineCounter { display: none; }
+	.powered a { top: 175px; left: 40px; }
+	.tops a { width: 30px; height: 30px; top: 175px; left: 0; line-height: 15px; }
+	#pray { margin: 30px auto 0; font-size: 0.95em; }
+	.padbottom { padding-bottom: 20px; }
+	.page-header { margin-top: 0px; }
+	div#error h1 a#indexe { width: 278px; height: 105px; background: url(/web/20220707114223im_/https://elbukhari.com/wp-content/themes/dr-abdullah-theme/images/merror_logo.png) no-repeat; }
+	.search-form { width: 100%; }
+	.search-submit { height: 50px; }
+	.errorNav { width: 100%; margin: 0 auto; overflow: hidden; }
+	.errorNav div ul { width: 100%; display: table; margin: 0 auto; text-align: center; }
+	.errorNav ul li a { display: block; width: 85px; height: 40px; border-radius: 0px; line-height: 25px; padding: 10px; float: right; margin: 0 5px 10px 5px; }
+	.bookPost  .featuredImage h2 { font: 1.3em 'Noton', Arial, sans-serif; }
+	#sidebar .bigwidget { margin-top: 0px; }
+	.bigwidget ul li { font: 0.85em 'fl', Arial, sans-serif; }
+	.bigwidget .fileName { font: 0.85em 'Droid', Arial, sans-serif; }
+	.nopad { margin: 0 !important; }
+	.searchIcon { width: 10%; display: none !important; }
+	.searchName { width: 45%; padding-right: 5px !important; }
+	.SearchCategory { width: 30%; }
+	.searhTime { width: 25%; }
+	#lastExplians .fileIcon { display: none !important; }
+	#lastExplians .fileName { width: 60% !important; text-indent: 15px; }
+	#lastExplians .fileViews { display: none !important; }
+	#lastExplians .filePlay { width: 40% !important; text-align: center !important; }
+	#lastExplians .fileDate {display: none !important;}
+
+	.recentAudio .fileName { font-size: 0.93em !important; }
+	#recentNews { margin: 30px auto 10px; }
+	#lecture .fileName, #lessons .fileName { width: 50% !important; }
+	#lecture .fileDate, #lessons .fileDate { display: none !important; }
+	#lecture .fileViews, #lessons .fileViews { display: none !important; }
+	#lecture .filePlay, #lessons .filePlay { width: 25% !important; }
+	#lecture .fileDownload, #lessons .fileDownload { width: 25% !important; }
+	.homeRow .rowNo { width: 10% !important; }
+	.homeRow .rowName { width: 50% !important; text-align: right !important; }
+	.homeRow .rowDate { width: 40% !important; text-align: left !important; }
+	.homeRow .rowViews { display: none !important; }
+	.homeRow .rowShare { display: none !important; }
+	.rowWrap .rowNo { width: 5%; }
+	.rowWrap .rowName { width: 35%; text-align: right !important; }
+	.rowWrap .rowDate { width: 30%; }
+	.rowWrap .rowShare { display: none !important; }
+	.rowWrap .rowDownload { width: 15%; text-align: center !important; }
+	.rowWrap .rowPlay { width: 15%; }
+
+
+	.Docfile .rowName { width: 50%; }
+	.Docfile .rowShare { display: none; }
+	.Docfile .rowDownload { width: 15%; text-align: center !important; }
+	.Docfile .rowPlay { width: 15%; }
+	.Docfile .rowText { width: 15%; }
+	p.books_excerpt, p.post_content { font: 0.95em 'Droid', Arial, sans-serif; }
+
+
+	#homeTabs > ul > li {
+	width: 45% !important;
+	float: right;
+	}
+}
+@media only screen and (min-width:768px) and (max-width:1024px) {
+	body { font-size: 15px !important; }
+	#index { top: 0; right: 0; left: 0; margin-right: auto; margin-left: auto; }
+	.socialHeader { width: 80px; position: absolute; top: 25px; right: 0px; left: 0; margin-right: auto; margin-left: auto; font-size: 1.2em; }
+	.dateH { text-align: center; right: 0; left: 0; margin-right: auto; margin-left: auto; top: 3px; }
+	#lastNews { display: none; }
+	#navMenu { width: 95%; left: 0; right: 2.5%; top: 211px; }
+	.searchGlass { top: 10px; left: 20px; font-size: 1.5em; }
+	.searchClose { top: 12%; right: 47%; left: 0; margin-right: auto; margin-left: auto; }
+	#recentNews { margin: 30px auto 5px auto; }
+	.logoFooter { display: none; }
+	#footer { overflow: hidden; }
+	.socialFooter { top: 30px; right: auto; left: 0px; width: 120px; z-index: 50000; }
+	.socialFooter ul li { list-style: none; display: block; float: right; }
+	.socialFooter ul li a { display: block; float: right; margin-left: 5px; }
+	.onlineCounter { display: none; }
+	.powered a { top: 175px; left: 40px; }
+	.tops a { width: 30px; height: 30px; top: 175px; left: 0; line-height: 15px; }
+	#pray { margin: 30px auto 0; font-size: 0.95em; }
+	#homeTabs > ul > li {
+	width: 40% !important;
+	float: right;
+	}
+}
+
+/* support Retina */
+@media all and (-webkit-min-device-pixel-ratio:1.5) {
+	#index { background: url(/web/20220707114223im_/https://elbukhari.com/wp-content/themes/dr-abdullah-theme/images/logo-2x.png); -webkit-background-size: cover; background-size: cover; background-position: top center; background-repeat: no-repeat; }
+	div#error h1 a#indexe { background: url(/web/20220707114223im_/https://elbukhari.com/wp-content/themes/dr-abdullah-theme/images/merror_logo_2x.png) no-repeat; }
+	#pray { background: #8e8e8e url(/web/20220707114223im_/https://elbukhari.com/wp-content/themes/dr-abdullah-theme/images/pray_widget-2x.png) 0 100% no-repeat; }
+	.bigwidget header { background: #7f7f7f url(/web/20220707114223im_/https://elbukhari.com/wp-content/themes/dr-abdullah-theme/images/widget_logo-2x.png) center center no-repeat; }
+}
+/*
+     FILE ARCHIVED ON 11:42:23 Jul 07, 2022 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 10:19:59 Mar 11, 2025.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+*/
+/*
+playback timings (ms):
+  captures_list: 0.709
+  exclusion.robots: 0.028
+  exclusion.robots.policy: 0.012
+  esindex: 0.013
+  cdx.remote: 133.993
+  LoadShardBlock: 165.52 (3)
+  PetaboxLoader3.datanode: 100.282 (4)
+  PetaboxLoader3.resolve: 168.953 (2)
+  load_resource: 107.419
+*/

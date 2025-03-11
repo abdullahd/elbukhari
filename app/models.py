@@ -1,12 +1,9 @@
 from django.db import models
 from wagtail.snippets.models import register_snippet
 from wagtail.fields import RichTextField, StreamField
-from wagtail.admin.panels import FieldPanel, MultiFieldPanel
-from wagtail.blocks import StructBlock, CharBlock, URLBlock, RichTextBlock
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel, TabbedInterface, ObjectList, FieldRowPanel
 from taggit.managers import TaggableManager
 from wagtail.search import index 
-from wagtail.images.blocks import ImageChooserBlock
-from wagtail.documents.blocks import DocumentChooserBlock
 from django.core.validators import URLValidator, EmailValidator
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -14,60 +11,26 @@ from wagtail.admin.mail import send_mail
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from wagtail.models import Page
 from django.shortcuts import render
-from wagtailmedia.blocks import AudioChooserBlock, VideoChooserBlock 
-from django import forms
+from django.conf import settings
 
+from modelcluster.fields import ParentalKey
+from modelcluster.contrib.taggit import ClusterTaggableManager
+from taggit.models import TaggedItemBase
+
+from .blocks import AudioBlock, VideoBlock, DocumentBlock
 # Define custom blocks for StreamField
-class AudioBlock(StructBlock):
-    title = CharBlock(required=False, help_text="Title for this audio")
-    audio_file = AudioChooserBlock(required=False, help_text="Select an audio file from media library")
-    audio_url = URLBlock(required=False, help_text="Or provide a URL to an external audio file")
-    description = RichTextBlock(required=False)
-    
-    class Meta:
-        icon = 'music'
-        template = 'blocks/audio_block.html'
-        label = 'Audio'
-
-
-class VideoBlock(StructBlock):
-    title = CharBlock(required=False, help_text="Title for this video")
-    video_file = VideoChooserBlock(required=False, help_text="Select a video file from media library")
-    video_url = URLBlock(required=False, help_text="Or provide a URL to an external video")
-    thumbnail = ImageChooserBlock(required=False)
-    description = RichTextBlock(required=False)
-    
-    class Meta:
-        icon = 'media'
-        template = 'blocks/video_block.html'
-        label = 'Video'
-
-
-class DocumentBlock(StructBlock):
-    title = CharBlock(required=False, help_text="Title for this document")
-    document = DocumentChooserBlock()
-    description = RichTextBlock(required=False)
-    
-    class Meta:
-        icon = 'doc-full'
-        template = 'blocks/document_block.html'
-        label = 'Document'
 
 
 class BaseModel(models.Model):
     title = models.CharField(max_length=255)
-    cover_image = models.ForeignKey('wagtailimages.Image', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
-    
-    # Replace individual media fields with StreamField
+    cover_image = models.ForeignKey('wagtailimages.Image', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')    
     media_content = StreamField([
         ('audio', AudioBlock()),
         ('video', VideoBlock()),
         ('document', DocumentBlock()),
-    ], blank=True, use_json_field=True, verbose_name="Media Content")
-    
+    ], blank=True, use_json_field=True, verbose_name="Media Content")    
     date = models.DateField("Publication Date", blank=True, null=True) 
-    masjid = models.TextField("Masjid", blank=True) 
-    makan = models.TextField("Makan", blank=True) 
+    masjid = models.ForeignKey('Masjid', null=True, blank=True, on_delete=models.SET_NULL, related_name='+', verbose_name=_("المسجد"))
     hits = models.PositiveIntegerField(default=0)
     is_featured = models.BooleanField("Muhim", default=False)
     search_notes = RichTextField(blank=True)
@@ -75,30 +38,44 @@ class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    # Main content panels
     panels = [
         FieldPanel('title'),
-        FieldPanel('cover_image'),
         FieldPanel('media_content'),
-        MultiFieldPanel([
-            FieldPanel('date'),
-            FieldPanel('masjid'),
-            FieldPanel('makan'),
-        ], heading="Location"),
-        MultiFieldPanel([
-            FieldPanel('hits'),
-            FieldPanel('is_featured'),
-            FieldPanel('search_notes'),
-            FieldPanel('tags'),
-        ], heading="Metadata"),
+        FieldRowPanel([
+            FieldPanel('cover_image', classname="col-6"),
+            FieldPanel('date', classname="col-6"),
+        ]),
+        FieldPanel('is_featured'),
     ]
+    
+    # Location panels in a separate tab
+    location_panels = [
+        FieldPanel('masjid'),
+    ]
+    
+    # Metadata panels in a separate tab
+    metadata_panels = [
+        # FieldPanel('hits'),
+        FieldPanel('tags'),
+    ]
+    
+    # Define the edit handler to use tabs
+    edit_handler = TabbedInterface([
+        ObjectList(panels, heading='Content'),
+        ObjectList(location_panels, heading='Location'),
+        ObjectList(metadata_panels, heading='Metadata'),
+    ])
     
     # Update search fields to include StreamField content
     search_fields = [
         index.SearchField('title', boost=10),
         index.SearchField('media_content'),
         index.SearchField('search_notes'),
-        index.SearchField('masjid'),
-        index.SearchField('makan'),
+        index.RelatedFields('masjid', [
+            index.SearchField('name'),
+            index.SearchField('location'),
+        ]),
         index.RelatedFields('tags', [
             index.SearchField('name'),
         ]),
@@ -121,10 +98,17 @@ class Khutbah(BaseModel):
     sermon_type = models.CharField(max_length=100, choices=[('friday', 'Friday Sermon'), ('eid', 'Eid Sermon'), ('other', 'Other Sermon')], default='friday')
     transcript = RichTextField(blank=True, null=True)
     
-    panels = BaseModel.panels + [
+    # Replace panels with content_panels and create a custom edit_handler
+    metadata_panels = BaseModel.metadata_panels + [
         FieldPanel('sermon_type'),
         FieldPanel('transcript'),
     ]
+    
+    edit_handler = TabbedInterface([
+        ObjectList(BaseModel.panels, heading='Content'),
+        ObjectList(BaseModel.location_panels, heading='Location'),
+        ObjectList(metadata_panels, heading='Metadata'),
+    ])
     
     search_fields = BaseModel.search_fields + [
         index.SearchField('transcript'),
@@ -139,9 +123,15 @@ class Khutbah(BaseModel):
 class Mohadarah(BaseModel):
     description = RichTextField(blank=True)
     
-    panels = BaseModel.panels + [
+    metadata_panels = BaseModel.metadata_panels + [
         FieldPanel('description'),
     ]
+    
+    edit_handler = TabbedInterface([
+        ObjectList(BaseModel.panels, heading='Content'),
+        ObjectList(BaseModel.location_panels, heading='Location'),
+        ObjectList(metadata_panels, heading='Metadata'),
+    ])
     
     search_fields = BaseModel.search_fields + [
         index.SearchField('description'),
@@ -157,26 +147,28 @@ class Sharhu(BaseModel):
     """Model for book commentary or explanation"""
     book_title = models.CharField(max_length=255)
     author = models.CharField(max_length=255, blank=True, null=True)
-    chapter = models.CharField(max_length=255, blank=True, null=True)
-    part_number = models.PositiveIntegerField(blank=True, null=True)
+
     
-    panels = BaseModel.panels + [
+    metadata_panels = BaseModel.metadata_panels + [
         FieldPanel('book_title'),
         FieldPanel('author'),
-        FieldPanel('chapter'),
-        FieldPanel('part_number'),
     ]
+    
+    edit_handler = TabbedInterface([
+        ObjectList(BaseModel.panels, heading='Content'),
+        ObjectList(BaseModel.location_panels, heading='Location'),
+        ObjectList(metadata_panels, heading='Metadata'),
+    ])
     
     search_fields = BaseModel.search_fields + [
         index.SearchField('book_title'),
         index.SearchField('author'),
-        index.SearchField('chapter'),
     ]
     
     class Meta:
         verbose_name = "Sharhu Kitab"
         verbose_name_plural = "Sharhu Kutub"
-        ordering = ['book_title', 'part_number']
+        ordering = ['book_title']
 
 
 @register_snippet
@@ -184,10 +176,16 @@ class Motarjmah(BaseModel):
     translated_language = models.CharField(max_length=100, default="English")
     translator = models.CharField(max_length=255, blank=True, null=True)
     
-    panels = BaseModel.panels + [
+    metadata_panels = BaseModel.metadata_panels + [
         FieldPanel('translated_language'),
         FieldPanel('translator'),
     ]
+    
+    edit_handler = TabbedInterface([
+        ObjectList(BaseModel.panels, heading='Content'),
+        ObjectList(BaseModel.location_panels, heading='Location'),
+        ObjectList(metadata_panels, heading='Metadata'),
+    ])
     
     search_fields = BaseModel.search_fields + [
         index.SearchField('translator'),
@@ -196,7 +194,7 @@ class Motarjmah(BaseModel):
     class Meta:
         verbose_name = "Motarjmah"
         verbose_name_plural = "Motarjmaat"
-        ordering = ['-date', 'title']  # Added default ordering
+        ordering = ['-date', 'title']
 
 
 @register_snippet
@@ -205,10 +203,16 @@ class Tilawah(BaseModel):
     surah = models.CharField(max_length=255, blank=True, null=True)
     ayat_range = models.CharField(max_length=100, blank=True, null=True, help_text="e.g., 1-10")
     
-    panels = BaseModel.panels + [
+    metadata_panels = BaseModel.metadata_panels + [
         FieldPanel('surah'),
         FieldPanel('ayat_range'),
     ]
+    
+    edit_handler = TabbedInterface([
+        ObjectList(BaseModel.panels, heading='Content'),
+        ObjectList(BaseModel.location_panels, heading='Location'),
+        ObjectList(metadata_panels, heading='Metadata'),
+    ])
     
     search_fields = BaseModel.search_fields + [
         index.SearchField('surah'),
@@ -217,7 +221,7 @@ class Tilawah(BaseModel):
     class Meta:
         verbose_name = "Tilawah"
         verbose_name_plural = "Tilawaat"
-        ordering = ['surah', 'ayat_range']  # Added logical ordering
+        ordering = ['surah', 'ayat_range']
 
 
 @register_snippet
@@ -294,10 +298,16 @@ class Article(BaseModel):
     subtitle = models.CharField(max_length=255, blank=True, null=True)
     body = RichTextField()
 
-    panels = BaseModel.panels + [
+    metadata_panels = BaseModel.metadata_panels + [
         FieldPanel('subtitle'),
         FieldPanel('body'),
     ]
+    
+    edit_handler = TabbedInterface([
+        ObjectList(BaseModel.panels, heading='Content'),
+        ObjectList(BaseModel.location_panels, heading='Location'),
+        ObjectList(metadata_panels, heading='Metadata'),
+    ])
     
     search_fields = BaseModel.search_fields + [
         index.SearchField('subtitle'),
@@ -333,17 +343,19 @@ class Announcement(BaseModel):
     show_as_banner = models.BooleanField(default=False, 
                                         help_text="Display as a site-wide banner announcement")
     
-    panels = BaseModel.panels + [
+    metadata_panels = BaseModel.metadata_panels + [
         FieldPanel('body'),
-        MultiFieldPanel([
-            FieldPanel('start_date'),
-            FieldPanel('end_date'),
-        ], heading="Announcement Period"),
-        MultiFieldPanel([
-            FieldPanel('priority'),
-            FieldPanel('show_as_banner'),
-        ], heading="Display Options"),
+        FieldPanel('start_date'),
+        FieldPanel('end_date'),
+        FieldPanel('priority'),
+        FieldPanel('show_as_banner'),
     ]
+    
+    edit_handler = TabbedInterface([
+        ObjectList(BaseModel.panels, heading='Content'),
+        ObjectList(BaseModel.location_panels, heading='Location'),
+        ObjectList(metadata_panels, heading='Metadata'),
+    ])
     
     search_fields = BaseModel.search_fields + [
         index.SearchField('subtitle'),
@@ -506,14 +518,23 @@ class KhutbahListingPage(ListingPage):
     """Page listing all Khutbah entries"""
     template = "pages/khutbah_listing.html"
     
+
     def get_items(self):
         return Khutbah.objects.all()
+    
+    def get_context(self, request, *args, **kwargs):
+        context = super().get_context(request, *args, **kwargs)
+        
+        # Add featured items to context
+        featured_items = Khutbah.objects.filter(is_featured=True)[:10]
+        context['featured_items'] = featured_items
+        
+        return context
     
     def filter_by_search(self, queryset, search_term):
         return queryset.filter(
             models.Q(title__icontains=search_term) |
-            models.Q(transcript__icontains=search_term) |
-            models.Q(masjid__icontains=search_term)
+            models.Q(transcript__icontains=search_term) 
         )
 
 
@@ -557,20 +578,6 @@ class MotarjmahListingPage(ListingPage):
         return queryset.filter(
             models.Q(title__icontains=search_term) |
             models.Q(translator__icontains=search_term)
-        )
-
-
-class TilawahListingPage(ListingPage):
-    """Page listing all Tilawah entries"""
-    template = "pages/tilawah_listing.html"
-    
-    def get_items(self):
-        return Tilawah.objects.all()
-    
-    def filter_by_search(self, queryset, search_term):
-        return queryset.filter(
-            models.Q(title__icontains=search_term) |
-            models.Q(surah__icontains=search_term)
         )
 
 
@@ -625,4 +632,45 @@ class AnnouncementListingPage(ListingPage):
             models.Q(body__icontains=search_term)
         )
 
+
+class HomePage(Page):
+    intro = RichTextField(blank=True, verbose_name=_("مقدمة الصفحة"))
+    
+    content_panels = Page.content_panels + [
+        FieldPanel('intro'),
+    ]
+
+    class Meta:
+        verbose_name = _("الصفحة الرئيسية")
+        verbose_name_plural = _("الصفحات الرئيسية")
+
+
+@register_snippet
+class Masjid(models.Model):
+    name = models.CharField(_("اسم المسجد"), max_length=255, blank=True)
+    location = models.CharField(_("الموقع"), max_length=255, blank=True)
+    description = RichTextField(_("الوصف"), blank=True)
+    
+    panels = [
+        FieldPanel('name'),
+        FieldPanel('location'),
+        FieldPanel('description'),
+    ]
+    
+    def __str__(self):
+        if self.location:
+            return f"{self.name} - {self.location}"
+        return self.name
+    
+    def get_khutbahs(self):
+        """Returns all khutbahs at this masjid"""
+        return self.khutbahs.all()
+    
+    def get_mohadarat(self):
+        """Returns all lectures at this masjid"""
+        return self.mohadarat.all()
+    
+    class Meta:
+        verbose_name = _("مسجد")
+        verbose_name_plural = _("المساجد")
 

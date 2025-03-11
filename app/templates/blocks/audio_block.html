@@ -1,27 +1,24 @@
-{% load wagtailcore_tags wagtailmedia_tags %}
+{% load wagtailcore_tags %}
 
 <div class="audio-block">
-    {% if value.title %}<h3>{{ value.title }}</h3>{% endif %}
-    
-    <div class="audio-player">
-        {% if value.audio_file %}
-            {% if value.audio_file.type == 'audio' %}
-                <audio controls>
-                    <source src="{{ value.audio_file.file.url }}" type="{{ value.audio_file.file.mime_type }}">
-                    Your browser does not support the audio element.
-                </audio>
-            {% endif %}
-        {% elif value.audio_url %}
-            <audio controls>
-                <source src="{{ value.audio_url }}" type="audio/mpeg">
-                Your browser does not support the audio element.
-            </audio>
-        {% endif %}
+    <h4 class="audio-title">{{ value.title }}</h4>
+    <div class="compact-player" data-url="{{ value.audio_url }}">
+        <div class="play-button">
+            <i class="fa-solid fa-play"></i>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+            <div class="position-indicator"></div>
+        </div>
+        <div class="time">0:00 / 0:00</div>
+        <a href="{{ value.audio_url }}" download class="download-button">
+            <i class="fa-solid fa-download"></i>
+        </a>
     </div>
     
     {% if value.description %}
-        <div class="audio-description">
-            {{ value.description|richtext }}
-        </div>
+    <div class="description">
+        {{ value.description|richtext }}
+    </div>
     {% endif %}
 </div> 
