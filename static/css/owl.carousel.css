@@ -1,0 +1,41 @@
+.owl-carousel .owl-wrapper:after { content: "."; display: block; clear: both; visibility: hidden; line-height: 0; height: 0; }
+
+/* display none until init */
+.owl-carousel { display: none; position: relative; width: 100%; -ms-touch-action: pan-y; direction: ltr; }
+.owl-carousel .owl-wrapper { display: none; position: relative; -webkit-transform: translate3d(0px, 0px, 0px); }
+.owl-carousel .owl-wrapper-outer { overflow: hidden; position: relative; width: 100%; }
+.owl-carousel .owl-item { float: left; margin-right: -1px; overflow: hidden;}
+.owl-controls .owl-page, .owl-controls .owl-buttons div { cursor: pointer; }
+.owl-controls { -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
+
+/* mouse grab icon */
+.grabbing { cursor: url(/web/20220707114218im_/https://elbukhari.com/wp-content/themes/dr-abdullah-theme/js/owl-carousel/grabbing.png) 8 8, move; }
+
+/* fix */
+.owl-carousel  .owl-wrapper, .owl-carousel  .owl-item { -webkit-backface-visibility: hidden; -moz-backface-visibility: hidden; -ms-backface-visibility: hidden; -webkit-transform: translate3d(0, 0, 0); -moz-transform: translate3d(0, 0, 0); -ms-transform: translate3d(0, 0, 0); }
+
+
+.owl-next { width: 20px; height: 20px; position: absolute; top: 62px; right: -23px;}
+.owl-next:before {content: "\E834"; font-family: 'fontello'; color: #fff;}
+.owl-prev { width: 20px; height: 20px;  position: absolute; top: 62px; left: -23px; }
+.owl-prev:before {content: "\E833"; font-family: 'fontello'; color: #fff; }
+/*
+     FILE ARCHIVED ON 11:42:18 Jul 07, 2022 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 10:19:59 Mar 11, 2025.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+*/
+/*
+playback timings (ms):
+  captures_list: 0.528
+  exclusion.robots: 0.021
+  exclusion.robots.policy: 0.008
+  esindex: 0.01
+  cdx.remote: 3.957
+  LoadShardBlock: 583.998 (3)
+  PetaboxLoader3.resolve: 577.889 (3)
+  PetaboxLoader3.datanode: 98.559 (4)
+  load_resource: 97.231
+*/
