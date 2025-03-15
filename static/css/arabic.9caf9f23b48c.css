@@ -1,0 +1,123 @@
+/* Arabic Styles for RTL layout enhancements */
+
+/* Set Tajawal as primary font for Arabic text */
+body {
+    font-family: 'Tajawal', sans-serif;
+    text-align: right;
+}
+
+/* Fix for Bootstrap RTL */
+[dir="rtl"] .row {
+    direction: rtl;
+}
+
+/* Improved RTL form elements */
+input, textarea, select {
+    text-align: right;
+}
+
+/* Arabic typography enhancements */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 700;
+}
+
+/* Arabic numbers formatting */
+.arabic-number {
+    font-feature-settings: "tnum";
+}
+
+/* Make Arabic text more readable */
+p, li, blockquote, td, th {
+    line-height: 1.7;
+    letter-spacing: 0;
+}
+
+/* Fix for Bootstrap badge in RTL */
+.badge {
+    margin-left: 0;
+    margin-right: 5px;
+}
+
+/* Fix for dropdown menus in RTL */
+.dropdown-menu {
+    right: 0 !important;
+    left: auto !important;
+    text-align: right;
+}
+
+/* Adjust search form for RTL */
+.searchform input[type="text"] {
+    padding-right: 15px;
+}
+
+/* Better spacing for Arabic lists */
+ul, ol {
+    padding-right: 20px;
+    padding-left: 0;
+}
+
+/* Arabic-friendly button adjustments */
+.btn {
+    letter-spacing: 0;
+    font-weight: 500;
+}
+
+/* Enhanced styling for Arabic pagination */
+.pagination .page-link {
+    padding: 0.5rem 0.75rem;
+}
+
+/* Better audio controls for RTL */
+.compact-player .download-button {
+    margin-right: 0;
+    margin-left: 10px;
+}
+
+/* Fix for FontAwesome icons in RTL context */
+[dir="rtl"] .fa-play:before {
+    content: "\f04a";
+}
+
+[dir="rtl"] .fa-pause:before {
+    content: "\f04c";
+}
+
+/* RTL fixes for tables */
+table.table th, 
+table.table td {
+    text-align: right;
+}
+
+/* Fix for Bootstrap's modal in RTL */
+.modal-header .close {
+    margin: -1rem auto -1rem -1rem;
+}
+
+/* Fix Bootstrap card for RTL */
+.card-header {
+    text-align: right;
+}
+
+/* Arabic date display improvements */
+.arabic-date {
+    direction: rtl;
+    unicode-bidi: embed;
+}
+
+/* Adjust pagination for RTL */
+.pagination {
+    padding-right: 0;
+}
+
+/* Mobile-specific RTL fixes */
+@media (max-width: 768px) {
+    .container {
+        text-align: right;
+    }
+    
+    .navbar-toggler {
+        margin-left: 0;
+        margin-right: auto;
+    }
+} 

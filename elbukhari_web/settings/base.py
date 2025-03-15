@@ -123,13 +123,34 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = 'ar'
 
-TIME_ZONE = "UTC"
+TIME_ZONE = 'Asia/Riyadh'
 
 USE_I18N = True
 
+USE_L10N = True
+
 USE_TZ = True
+
+# Available languages for translation
+LANGUAGES = [
+    ('ar', 'العربية'),
+    ('en', 'English'),
+]
+
+# Location of translation files
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),
+]
+
+# Default date format to use
+DATE_FORMAT = 'j F Y'
+DATE_INPUT_FORMATS = ['%Y-%m-%d', '%d/%m/%Y', '%d-%m-%Y']
+
+# Ensure Django outputs dates in the correct format
+SHORT_DATE_FORMAT = 'j F Y'
+DATETIME_FORMAT = 'j F Y H:i'
 
 
 # Static files (CSS, JavaScript, Images)
@@ -211,3 +232,6 @@ WAGTAILADMIN_BASE_URL = "http://example.com"
 # if untrusted users are allowed to upload files -
 # see https://docs.wagtail.org/en/stable/advanced_topics/deploying.html#user-uploaded-files
 WAGTAILDOCS_EXTENSIONS = ['csv', 'docx', 'key', 'odt', 'pdf', 'pptx', 'rtf', 'txt', 'xlsx', 'zip']
+
+# Make this unique, and don't share it with anybody.
+SECRET_KEY = 'b^7b+d7-...'

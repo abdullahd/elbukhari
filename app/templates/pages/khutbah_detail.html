@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags static arabic_tags %}
+
+{% block title %}{{ khutbah.title }} | {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 col-md-8">
+        <header class="page-header">
+            <h1 class="page-title">{{ khutbah.title }}</h1>
+        </header>
+        
+        <div class="contentTable">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>العنوان</th>
+                        <th>الصوت</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ khutbah.title }}</td>
+                        <td>
+                            {% for block in khutbah.media_content %}
+                                {% if block.block_type == 'audio' %}
+                                    <div class="compact-player" data-url="{{ block.value.audio_url }}">
+                                        <div class="play-button">
+                                            <i class="fa-solid fa-play"></i>
+                                        </div>
+                                        <div class="progress-container">
+                                            <div class="progress-bar"></div>
+                                            <div class="position-indicator"></div>
+                                        </div>
+                                        <div class="time">0:00 / 0:00</div>
+                                        <a href="{{ block.value.audio_url }}" download class="download-button">
+                                            <i class="fa-solid fa-download"></i>
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        {% if khutbah.transcript %}
+        <div class="transcript mt-4">
+            <h3>نص الخطبة</h3>
+            <div class="rich-text">
+                {{ khutbah.transcript|richtext }}
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="meta mt-4">
+            {% if khutbah.date %}<p><strong>التاريخ:</strong> <span class="arabic-date">{{ khutbah.date|date:"d F Y" }}</span></p>{% endif %}
+            {% if khutbah.masjid %}
+                <p><strong>المسجد:</strong> {{ khutbah.masjid|get_masjid_display }}</p>
+                {% if khutbah.masjid.location %}
+                    <p><strong>الموقع:</strong> {{ khutbah.masjid.location }}</p>
+                {% endif %}
+            {% endif %}
+            {% if khutbah.makan %}<p><strong>المكان:</strong> {{ khutbah.makan }}</p>{% endif %}
+            <p><strong>المشاهدات:</strong> <span class="arabic-number">{{ khutbah.hits }}</span></p>
+        </div>
+        
+        {% if khutbah.tags.all %}
+        <div class="tags mt-4">
+            <h5>الكلمات المفتاحية:</h5>
+            <div class="tagCloud">
+                {% for tag in khutbah.tags.all %}
+                <a href="?tag={{ tag.name }}" class="tag">{{ tag.name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4 col-md-4 hidden-xs">
+        <div class="row">
+            <div id="sidebar" class="secondary">
+                <div class="col-lg-12">
+                    <div class="bigwidget">
+                        <header>
+                            <h2>خطب أخرى</h2>
+                        </header>
+                        <div class="bigwidgetWrap">
+                            <ul>
+                                {% for item in related_khutbahs %}
+                                    <div class="rowFile">
+                                        <ul>
+                                            <li class="fileIcon"><i class="fa-solid fa-chevron-right"></i></li>
+                                            <li class="fileName"><a href="/khutbah/{{ item.id }}/">{{ item.title }}</a></li>
+                                            <li class="fileCat">{{ item.get_sermon_type_display }}</li>
+                                            {% for block in item.media_content %}
+                                                {% if block.block_type == 'audio' %}
+                                                    <li class="filePlay">
+                                                        <div class="compact-player" data-url="{{ block.value.audio_url }}">
+                                                            <div class="play-button">
+                                                                <i class="fa-solid fa-play"></i>
+                                                            </div>
+                                                            <div class="progress-container">
+                                                                <div class="progress-bar"></div>
+                                                                <div class="position-indicator"></div>
+                                                            </div>
+                                                            <div class="time">0:00 / 0:00</div>
+                                                        </div>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Use a properly scoped initialization function
+    (function() {
+        function initAudioPlayers() {
+            if (typeof ModernPlayer !== 'undefined') {
+                ModernPlayer.init();
+            } else if (typeof CompactPlayer !== 'undefined') {
+                CompactPlayer.init();
+            }
+        }
+        
+        // Add event listener
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initAudioPlayers);
+        } else {
+            initAudioPlayers();
+        }
+    })();
+</script>
+{% endblock %} 

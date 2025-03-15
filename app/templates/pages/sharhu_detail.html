@@ -1,0 +1,5 @@
+{% load arabic_tags %}
+
+{% if object.masjid %}
+<p><strong>المسجد:</strong> {{ object.masjid|get_masjid_display }}</p>
+{% endif %} 
