@@ -1,18 +1,19 @@
 from django.db import models
 from wagtail.snippets.models import register_snippet
 from wagtail.fields import RichTextField, StreamField
-from wagtail.admin.panels import FieldPanel, MultiFieldPanel
-from wagtail.blocks import StructBlock, URLBlock, RichTextBlock
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel, FieldRowPanel, PageChooserPanel
+from wagtail.blocks import RichTextBlock, ListBlock
 from taggit.managers import TaggableManager
-from wagtail.documents.blocks import DocumentChooserBlock
 from django.core.validators import URLValidator
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from wagtail.models import Page
-from django.shortcuts import render
-from wagtailmedia.blocks import AudioChooserBlock, VideoChooserBlock 
-
+from django.shortcuts import render, redirect
+from django.conf import settings
+from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
+from django.core.exceptions import ValidationError
+from .blocks import *
 
 @register_snippet
 class Location(models.Model):
@@ -22,31 +23,6 @@ class Location(models.Model):
         FieldPanel('name')
     ]
 
-
-class AudioBlock(StructBlock):
-    audio_file = AudioChooserBlock(required=False, help_text="Select an audio file from media library")
-    
-    class Meta:
-        icon = 'music'
-        template = 'blocks/audio_block.html'
-        label = 'Audio'
-
-class VideoBlock(StructBlock):
-    video_file = VideoChooserBlock(required=False, help_text="Select a video file from media library")
-    video_url = URLBlock(required=False, help_text="Or provide a URL to an external video")
-
-    class Meta:
-        icon = 'media'
-        template = 'blocks/video_block.html'
-        label = 'Video'
-
-class DocumentBlock(StructBlock):
-    document = DocumentChooserBlock()
-    
-    class Meta:
-        icon = 'doc-full'
-        template = 'blocks/document_block.html'
-        label = 'Document'
 
 class BaseModel(models.Model):
     title = models.CharField(max_length=255)
@@ -90,6 +66,7 @@ class Khutbah(BaseModel):
 
     class Meta:
         verbose_name_plural = "Khutab"
+
 
 @register_snippet
 class Mohadarah(BaseModel):
@@ -271,4 +248,52 @@ class ArticlePage(Page):
         FieldPanel('article'),
     ]
     
+
+class SiteHeaderFooter(models.Model):
+    header_footer_content = StreamField([
+        ('policy_block',ListBlock(LinkBlock(required=False))),
+        ('social_media_block',ListBlock(IconBlock(required=False))),
+        ], max_num=7, use_json_field=True)
+
+    def __str__(self):
+        return 'Header Footer Configuration'
     
+    # allow only one object
+    def clean(self):
+        if not self.pk and SiteHeaderFooter.objects.exists():
+            raise ValidationError("We are Sorry! Only One Entry allowed!")
+        
+
+@register_setting
+class SiteConfiguration(BaseSiteSetting):
+    site_logo = models.ForeignKey('wagtailimages.Image',null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    site_favicon = models.ForeignKey('wagtailimages.Image',null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    google_analytics_tag = models.CharField(max_length=300, blank=True)
+    excluded_models_in_data_export = models.TextField(blank=True, verbose_name="excluded_models for archive", default='wagtailcore.modellogentry,wagtailcore.pagelogentry,wagtailcore.pagesubscription,admin.logentry,auth.permission,wagtailsearch.indexentry,wagtailcore.referenceindex,wagtailimages.rendition,contenttypes,sessions,wagtailcore.groupcollectionpermission')
+
+    def __str__(self):
+        return 'Add Site Configuration'  
+    
+    
+class RedirectPage(Page):
+    is_creatable = settings.CAN_CONTENT_EDITOR_CREATE_THIS_PAGE
+
+    """A page that redirects users to another page (internal or external)"""    
+    redirect_page = models.ForeignKey('wagtailcore.Page', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    external_link = models.URLField(max_length=255, blank=True, null=True, help_text='Links to an external page?')
+
+    def serve(self, request, *args, **kwargs):
+        if self.redirect_page:
+            return redirect(self.redirect_page.url, permanent=False)
+        elif self.external_link:
+            return redirect(self.external_link, permanent=False)
+        else:
+            return redirect('/', permanent=False)
+
+    content_panels = Page.content_panels + [
+        FieldRowPanel([
+            PageChooserPanel('redirect_page'),
+            FieldPanel('external_link'),
+        ]),        
+    ]
+

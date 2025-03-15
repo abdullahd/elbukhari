@@ -1,52 +1,65 @@
-<header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="/">Islamic Content Archive</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMain" 
-                    aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarMain">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
-                    </li>
-                    
-                    <!-- Content Types Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="contentDropdown" role="button" 
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Content
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="contentDropdown">
-                            <a class="dropdown-item" href="/khutbahs/">Khutbahs</a>
-                            <a class="dropdown-item" href="/lectures/">Lectures</a>
-                            <a class="dropdown-item" href="/commentaries/">Book Commentaries</a>
-                            <a class="dropdown-item" href="/translations/">Translations</a>
-                            <a class="dropdown-item" href="/recitations/">Recitations</a>
-                            <a class="dropdown-item" href="/books/">Books</a>
-                            <a class="dropdown-item" href="/articles/">Articles</a>
-                        </div>
-                    </li>
-                    
-                    <!-- About link -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="/about/">About</a>
-                    </li>
-                    
-                    <!-- Contact link -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="/contact/">Contact</a>
-                    </li>
-                </ul>
-                
-                <!-- Search Form -->
-                <form class="form-inline my-2 my-lg-0" action="/search/" method="get">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="q">
-                    <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
-                </form>
+{% load static navigation_tags %}
+
+<nav class="navbar navbar-expand-lg shadow-sm py-lg-0 sticky-top">
+    <div class="container d-lg-flex d-block">
+        <div class="d-flex gap-3 justify-content-between align-items-center">
+        <a class="navbar-brand" href="/" target="_blank">
+            <span class="kfupm-logo">
+            <img src="{% static 'images/kfupm_logo_en.svg' %}" class="d-lg-block d-none">
+            <img src="{% static 'images/kfupm_logo_icon.svg' %}" class="d-lg-none">
+            </span>
+        </a>
+        <a href="/" class="college-logo-link">
+            Global Engagement
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavBar" aria-controls="mainNavBar" aria-expanded="false" aria-label="Toggle navigation">
+            <!-- <span class="navbar-toggler-icon"></span> -->
+            <img class="nav-menu-icon" src="{% static 'images/menu.svg' %}">
+            <i class="fa-solid fa-xmark nav-close-icon"></i>
+        </button>
+        </div>
+        <!--Disable Search 20250108 -->
+        <!-- <div class="nav-item dropdown search d-lg-none">
+        <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-search"></i>
+        </a>
+        <div class="dropdown-menu ml-auto">
+            <div class="container">
+            <div class="row g-lg-3">
+                <div class="col-12">
+                <div class="d-flex gap-4 nav-search">
+                    <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control form-control-lg" placeholder="Search for any Keywords">
+                    </div>
+                    <button class="btn btn-light close-nav-search"><i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+                </div>
+            </div>
             </div>
         </div>
-    </nav>
-</header> 
+        </div> -->
+    </div>
+
+    <div class="collapse navbar-collapse secondary-nav" id="mainNavBar">
+        <div class="container flex-lg-row flex-column">
+            <!-- <div class="small-devices-only">
+            <div class="d-flex gap-4 nav-search">
+                <div class="input-group">
+                <input type="text" class="form-control form-control-lg" placeholder="Search for any Keywords">
+                </div>
+                <button class="btn btn-light close-nav-search"><i class="bi bi-search"></i></button>
+            </div>
+            </div> -->
+            <ul class="navbar-nav mb-2 mb-lg-0">
+                {% top_menu parent=parent calling_page=self %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+
+
+  
+ 

@@ -1,41 +1,47 @@
 from django.utils.translation import gettext_lazy as _
-from wagtail.blocks import StructBlock, CharBlock, URLBlock, RichTextBlock
-from wagtail.images.blocks import ImageChooserBlock
+from wagtail.blocks import StructBlock, CharBlock, URLBlock, RichTextBlock, TextBlock, ChoiceBlock
 from wagtailmedia.blocks import AudioChooserBlock, VideoChooserBlock
 from wagtail.documents.blocks import DocumentChooserBlock
 
 
 class AudioBlock(StructBlock):
-    title = CharBlock(required=False, help_text="Title for this audio")
     audio_file = AudioChooserBlock(required=False, help_text="Select an audio file from media library")
-    audio_url = URLBlock(required=False, help_text="Or provide a URL to an external audio file")
-    description = RichTextBlock(required=False)
     
     class Meta:
+        icon = 'music'
         template = 'blocks/audio_block.html'
-        icon = 'fa-volume-up'
-        label = _("ملف صوتي")
+        label = 'Audio'
 
 
 class VideoBlock(StructBlock):
-    title = CharBlock(required=False, help_text="Title for this video")
     video_file = VideoChooserBlock(required=False, help_text="Select a video file from media library")
     video_url = URLBlock(required=False, help_text="Or provide a URL to an external video")
-    thumbnail = ImageChooserBlock(required=False)
-    description = RichTextBlock(required=False)
-    
+
     class Meta:
+        icon = 'media'
         template = 'blocks/video_block.html'
-        icon = 'fa-film'
-        label = _("فيديو")
+        label = 'Video'
 
 
 class DocumentBlock(StructBlock):
-    title = CharBlock(required=False, help_text="Title for this document")
     document = DocumentChooserBlock()
-    description = RichTextBlock(required=False)
     
     class Meta:
+        icon = 'doc-full'
         template = 'blocks/document_block.html'
-        icon = 'fa-file-pdf-o'
-        label = _("ملف PDF") 
+        label = 'Document'
+
+
+class LinkBlock(StructBlock):
+    text = CharBlock(label="link text", required=False)
+    url = TextBlock(label="Enter a valid URL", required=False)
+
+
+class IconBlock(LinkBlock):
+    class Icon:
+        CHOICES = (
+            ('fas fa-envelope', 'Mail'),
+            ('fa-brands fa-facebook-f', 'Facebook'),
+            ('fa-brands fa-x-twitter', 'Twitter'),
+        )
+    icon_class = ChoiceBlock(blank=True, null=True, choices=Icon.CHOICES, help_text='Choose a Icon')
