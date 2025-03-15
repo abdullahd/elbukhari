@@ -11,17 +11,6 @@
                     Your browser does not support the audio element.
                 </audio>
             {% endif %}
-        {% elif value.audio_url %}
-            <audio controls>
-                <source src="{{ value.audio_url }}" type="audio/mpeg">
-                Your browser does not support the audio element.
-            </audio>
-        {% endif %}
     </div>
-    
-    {% if value.description %}
-        <div class="audio-description">
-            {{ value.description|richtext }}
-        </div>
-    {% endif %}
+
 </div> 
