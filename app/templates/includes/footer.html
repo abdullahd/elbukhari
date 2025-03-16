@@ -1,13 +1,12 @@
-{% load base_tags %}
-
+{% load base_tags static %}
 
 <footer id="footer">
     <div class="container">
         <div class="col-lg-8">
             <span class="logoFooter">
-                <img src="{% static 'images/footer_logo.png' %}" alt="Footer Logo" />
+                <img src="/static/images/footer_logo.png" alt="Footer Logo" />
             </span>
-            {% social_media_section %}      
+            {% social_media_section %}             
             <div class="rights">
                 جميع الحقوق محفوظة للموقع - 1446 هـ
             </div>

@@ -1,15 +1,6 @@
 @charset "UTF-8";
 @import url('fonts.css');
 
-/*
-Theme Name: قالب موقع الشيخ الدكتور عبدالله البخاري
-Theme URI: https://www.egydes.com
-Author: تصميم مصري - م/حسين عادل
-Author URI: https://www.egydes.com
-Description: القالب الرسمي موقع فضيلة الدكتور عبدالله البخاري
-Version: 1.0
-Text Domain: abtheme
-*/
 * {
 	padding: 0;
 	margin: 0;
@@ -33,7 +24,6 @@ body {
 	height: 250px;
 	background-color: #9c7c43;
 }
-.nmheader {padding: 0; margin: 0;}
 
 #index {
 	display: block;
@@ -340,20 +330,6 @@ body {
 }
 #searchsubmit:hover {
 	background-color: #745827;
-}
-#footer {
-	width: 100%;
-	height: 225px;
-	background-color: #828282;
-}
-.logoFooter {
-	display: block;
-	width: 199px;
-	height: 271px;
-	background: url(../images/footer_logo.png) no-repeat;
-	position: absolute;
-	top: -120px;
-	right: 10px;
 }
 .socialFooter {
 	width: 30px;
@@ -936,7 +912,7 @@ ul.tabs li.current {
 }
 #pray {
 	width: 100%;
-	background: #8e8e8e url(../images/pray_widget.png) left bottom no-repeat;
+	background: #8e8e8e url(..images/pray_widget.png) left bottom no-repeat;
 	overflow: hidden;
 	margin: 67px auto 0;
 	padding: 20px 10px 75px 10px;
@@ -2090,24 +2066,3 @@ padding: 10px; width: 75%;float: left;
 .shareContent { float: left !important;}
 .shareContent * {float: right ; margin-left: 15px !important; vertical-align: middle;  }
 
-
-/*
-     FILE ARCHIVED ON 11:42:23 Jul 07, 2022 AND RETRIEVED FROM THE
-     INTERNET ARCHIVE ON 00:18:21 Feb 26, 2025.
-     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
-
-     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
-     SECTION 108(a)(3)).
-*/
-/*
-playback timings (ms):
-  captures_list: 0.716
-  exclusion.robots: 0.031
-  exclusion.robots.policy: 0.018
-  esindex: 0.014
-  cdx.remote: 102.991
-  LoadShardBlock: 126.158 (3)
-  PetaboxLoader3.datanode: 137.51 (4)
-  load_resource: 83.548
-  PetaboxLoader3.resolve: 65.854
-*/

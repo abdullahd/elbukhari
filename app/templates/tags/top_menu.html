@@ -5,13 +5,13 @@
 <ul id="main-menu" class="menu">
     {% for menu_item in menu_items %}
     {% if menu_item.show_dropdown %}
-        <li class="noneLink menu-item menu-item-has-children"><a><i class="{{ menu_item.icon_class }}"></i><span>{{ menu_item.title }}</span></a>
-        </li>
+        <li class="noneLink menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children"><a><i class="{{ menu_item.icon_class }}" aria-hidden="true" style="font-size:1em;"></i><span>{{ menu_item.title }}</span></a>
         <ul class="sub-menu">
             {% top_menu_children parent=menu_item %}  
         </ul>
+        </li>   
     {% else %}
-        <li class="menu-item"><a href="{% pageurl menu_item %}"><i class="{{ menu_item.icon_class }}"></i><span>{{ menu_item.title }}</span></a></li>
+        <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="{% pageurl menu_item %}"><i class="{{ menu_item.icon_class }}" aria-hidden="true" style="font-size:1em;"></i><span>{{ menu_item.title }}</span></a></li>
     {% endif %}
 {% endfor %} 
 </ul>
