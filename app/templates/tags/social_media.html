@@ -1,0 +1,7 @@
+<div class="socialFooter">
+    <ul>
+    {% for link in links %}
+        <li><a href="{{ link.value.url }}" target='_blank' rel='noopener noreferrer' class="h5"><i class="{{ link.value.icon_class }}"></i></a></li>        
+    {% endfor %}
+    </ul>
+</div>

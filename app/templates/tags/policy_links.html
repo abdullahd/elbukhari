@@ -1,0 +1,14 @@
+{% load base_tags %}
+
+<div class="col-12 col-lg-4 col-xl-3">© {% now "Y" %}. All rights reserved.</div>
+<div class="col-12 col-lg-8 col-xl-6">
+    <ul class="list-unstyled d-flex flex-wrap gap-3 justify-content-start justify-content-md-end justify-content-xl-center mb-0">
+        {% for link in links %}
+            {% if link.value.url and link.value.url|contains:request.get_host  %}
+                <li><a href="{{ link.value.url }}" target='_blank' rel='noopener noreferrer'>{{ link.value.text }}</a></li> 
+            {% elif link.value.url %}
+                <li><a href="{{ link.value.url }}">{{ link.value.text }}</a></li> 
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>

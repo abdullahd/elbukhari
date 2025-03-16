@@ -129,6 +129,15 @@ class Article(BaseModel):
     class Meta:
         ordering = ['title']
 
+    panels = [
+        FieldPanel('title'),
+        FieldPanel('media_content'),
+        MultiFieldPanel([
+            # FieldPanel('hits'),
+            FieldPanel('date'),
+            FieldPanel('is_featured'),
+        ], heading="Date"),
+    ]
 @register_snippet
 class Announcement(BaseModel):    
     # Announcement-specific dates (in addition to the publication date from BaseModel)

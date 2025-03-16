@@ -68,15 +68,3 @@ def arabic_numbers(value):
     
     return value 
 
-@register.filter
-def get_masjid_display(masjid):
-    """
-    Return a well-formatted display string for a masjid object
-    """
-    if not masjid:
-        return ""
-    
-    if hasattr(masjid, 'location') and masjid.location:
-        return f"{masjid.name} - {masjid.location}"
-    
-    return masjid.name 

@@ -1,86 +1,21 @@
-{% load wagtailcore_tags static %}
-<!DOCTYPE html>
-<html dir="rtl" lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}ترجمة الشيخ – الموقع الرسمي لفضيلة الشيخ عبدالله البخاري{% endblock %}</title>
-    {% load static %}
-    <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.png' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/owl.carousel@2.3.4/dist/assets/owl.carousel.min.css">
-</head>
-<body>
-    <!-- Header -->
-    <header id="header">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <h1 class="nmheader">
-                        <a href="/" id="index">
-                            <img src="{% static 'images/logo.png' %}" alt="Logo" />
-                        </a>
-                    </h1>
-                    <div class="socialHeader">
-                        <ul>
-                            <li><a href="https://twitter.com/dr_albukhary"><i class="fa-brands fa-twitter"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+{% block content %}
     <div class="container padbottom">
         <div class="row">
             <div class="col-lg-8 col-md-8">
-                {% block content %}
-                    <div class="page">
-                        <div class="pageHeader">
-                            <h2>{{ page.title }}</h2>
-                        </div>
-
-                        {% for block in page.article.media_content %}
-                            {% if block.block_type == "text" %}
-                            <p>{{ block.value|richtext }}</p>
-                            {% endif %}
-                        {% endfor %}
+                <div class="page">
+                    <div class="pageHeader">
+                        <h2>{{ page.title }}</h2>
                     </div>
-                {% endblock %}
+
+                    {% for block in page.article.media_content %}
+                        {% if block.block_type == "text" %}
+                        <p>{{ block.value|richtext }}</p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
-
-    <footer id="footer">
-        <div class="container">
-            <div class="col-lg-8">
-                <span class="logoFooter">
-                    <img src="{% static 'images/footer_logo.png' %}" alt="Footer Logo" />
-                </span>
-                <div class="socialFooter">
-                    <ul>
-                        <li><a href="https://twitter.com/dr_albukhary"><i class="fa-brands fa-twitter"></i></a></li>
-                    </ul>
-                </div>
-                <div class="rights">
-                    جميع الحقوق محفوظة للموقع - 1446 هـ
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery.marquee@1.6.0/jquery.marquee.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/owl.carousel@2.3.4/dist/owl.carousel.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery-match-height@0.7.2/dist/jquery.matchHeight.min.js"></script>
-
-</body>
-</html>
+{% endblock %}
