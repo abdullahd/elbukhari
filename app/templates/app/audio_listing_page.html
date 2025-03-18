@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+{% block content %}
+    <div class="container padbottom">
+        <div class="row">
+            <div class="col-lg-8 col-md-8">
+                <div class="page">
+                    <div class="pageHeader">
+                        <h2>{{ page.title }}</h2>
+                    </div>
+
+                    {% for item in items %}
+                      {% for block in item.media_content %}
+                        {% if block.block_type == 'audio' and block.value %}
+                            {% with  block.value.audio_file as aud %}
+                            <a href="{{ aud.url }}" class="audio-link">{{ item.title }} </a>
+                            <audio controls class="audio-player">
+                                <source src="{{ aud.url }}" type="{{ aud.file.content_type }}">>
+                            Your browser does not support the audio element.
+                            </audio>
+                            {% endwith %}
+                        {% endif %}                       
+                      {% endfor %}
+                
+                      <br>
+
+                    {% endfor %}
+                   
+                   <!-- add pagination -->
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

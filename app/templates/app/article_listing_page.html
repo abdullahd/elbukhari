@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+{% block content %}
+    <div class="container padbottom">
+        <div class="row">
+            <div class="col-lg-8 col-md-8">
+                <div class="page">
+                    <div class="pageHeader">
+                        <h2>{{ page.title }}</h2>
+                    </div>
+
+                    {% for item in items %}
+                      {% for block in item.media_content %}
+                        {% if block.block_type == 'text' and block.value %}
+                            {{ block.value|richtext }}
+                        {% endif %}                       
+                      {% endfor %}
+                
+                      <br>
+
+                    {% endfor %}
+                   
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -23,7 +23,6 @@ class Location(models.Model):
         FieldPanel('name')
     ]
 
-
 class BaseModel(models.Model):
     title = models.CharField(max_length=255)
     cover_image = models.ForeignKey('wagtailimages.Image', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
@@ -32,8 +31,8 @@ class BaseModel(models.Model):
         ('video', VideoBlock()), 
         ('document', DocumentBlock()),
         ('text', RichTextBlock()),
-        ], blank=True, use_json_field=True, verbose_name="Media Content")
-    date = models.DateField("Publication Date", blank=True, null=True) 
+    ], blank=True, use_json_field=True, verbose_name="Media Content")
+    date = models.DateField("Publication Date", blank=True, null=True)
     location = models.ForeignKey('Location', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
     hits = models.PositiveIntegerField(default=0)
     is_featured = models.BooleanField("Muhim", default=False)
@@ -61,26 +60,36 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
-@register_snippet
-class Khutbah(BaseModel):
+class AudioModel(BaseModel):
+    media_content = StreamField([
+        ('audio', AudioBlock()), 
+    ], blank=True, use_json_field=True, verbose_name="Media Content")
+    class Meta:
+        abstract = True
 
+    panels = [
+        FieldPanel('title'),
+        FieldPanel('date'),
+        FieldPanel('media_content'),
+    ]
+
+@register_snippet
+class Khutbah(AudioModel):
     class Meta:
         verbose_name_plural = "Khutab"
 
-
 @register_snippet
-class Mohadarah(BaseModel):
-    
+class Mohadarah(AudioModel):
     class Meta:
         verbose_name_plural = "Mohadarat"
 
 @register_snippet
-class Sharhu(BaseModel):    
+class Sharhu(AudioModel):
     class Meta:
         verbose_name_plural = "Shroohat"
 
 @register_snippet
-class Motarjmah(BaseModel):
+class Motarjmah(AudioModel):
     translator = models.CharField(max_length=255, blank=True, null=True)
     
     panels = BaseModel.panels + [
@@ -91,12 +100,20 @@ class Motarjmah(BaseModel):
         verbose_name_plural = "Motarjmaat"
 
 @register_snippet
+class QATrack(AudioModel):
+    class Meta:
+        verbose_name_plural = "QA Tracks"
+
+@register_snippet
 class Tilawah(BaseModel):
     class Meta:
         verbose_name_plural = "Tilawaat"
 
 @register_snippet
-class Book(BaseModel):
+class Kitab(BaseModel):
+    media_content = StreamField([      
+        ('document', DocumentBlock()),
+    ], blank=True, use_json_field=True, verbose_name="Book Content")
     publisher = models.CharField(max_length=255, blank=True, null=True)
     edition = models.CharField(max_length=50, blank=True, null=True, help_text="e.g., First Edition, 2nd Edition")
     publication_year = models.PositiveSmallIntegerField(blank=True, null=True)
@@ -112,10 +129,6 @@ class Book(BaseModel):
             FieldPanel('publication_year'),
         ], heading="Publication Details"),
         FieldPanel('media_content'),
-        MultiFieldPanel([
-            FieldPanel('hits'),
-            FieldPanel('is_featured'),
-        ], heading="Metadata"),
     ]
     
     def __str__(self):
@@ -126,6 +139,11 @@ class Book(BaseModel):
 
 @register_snippet
 class Article(BaseModel):
+    media_content = StreamField([      
+        ('document', DocumentBlock()),
+        ('text', RichTextBlock()),
+    ], blank=True, use_json_field=True, verbose_name="Article Media Content")
+
     class Meta:
         ordering = ['title']
 
@@ -138,20 +156,27 @@ class Article(BaseModel):
             FieldPanel('is_featured'),
         ], heading="Date"),
     ]
+
 @register_snippet
-class Announcement(BaseModel):    
-    # Announcement-specific dates (in addition to the publication date from BaseModel)
+class Announcement(models.Model):
+    text = models.TextField(blank=True)
     start_date = models.DateField("Start Date", blank=True, null=True, 
                                   help_text="Date when this announcement becomes active")
     end_date = models.DateField("End Date", blank=True, null=True,
                                help_text="Date when this announcement expires")
-    
-    panels = BaseModel.panels + [
-        MultiFieldPanel([
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    panels = [
+        FieldPanel('text'),
+        FieldRowPanel([
             FieldPanel('start_date'),
             FieldPanel('end_date'),
-        ], heading="Announcement Period"),
+        ], heading="Date"),
     ]
+    
+    def __str__(self):
+        return self.text
+   
     
     def is_active(self):
         today = timezone.now().date()
@@ -165,7 +190,7 @@ class Announcement(BaseModel):
         return True  # No dates set means always active
     
     class Meta:
-        ordering = [ '-start_date', 'title']
+        ordering = ['-start_date']
 
 @register_snippet
 class SocialMedia(models.Model):
@@ -190,44 +215,14 @@ class SocialMedia(models.Model):
         ordering = ['name']
 
 class ListingPage(Page):
-    
     class Meta:
         abstract = True
     
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
-        
-        # Get all instances of the content type
         items = self.get_items()
-        
-        # Filter by tag if specified
-        tag = request.GET.get('tag')
-        if tag:
-            items = items.filter(tags__name=tag)
-        
-        # Handle search query
-        search_query = request.GET.get('q', None)
-        if search_query:
-            # Replace filter_by_search call with direct queryset filtering
-            items = items.filter(title__icontains=search_query)
-            
-        # Sort items
-        sort = request.GET.get('sort', '-date')
-        if sort:
-            if sort == 'title':
-                items = items.order_by('title')
-            elif sort == '-title':
-                items = items.order_by('-title')
-            elif sort == 'date':
-                items = items.order_by('date')
-            elif sort == '-date':
-                items = items.order_by('-date')
-            elif sort == 'hits':
-                items = items.order_by('-hits')
-        
-        # Pagination
         page = request.GET.get('page')
-        paginator = Paginator(items, 12)  # 12 items per page
+        paginator = Paginator(items, 50)  # items per page
         try:
             items = paginator.page(page)
         except PageNotAnInteger:
@@ -236,58 +231,43 @@ class ListingPage(Page):
             items = paginator.page(paginator.num_pages)
             
         context['items'] = items
-        context['search_query'] = search_query
-        context['current_tag'] = tag
-        context['current_sort'] = sort
         
         return context
     
     def get_items(self):
         return []
-    
-    
+
     def serve(self, request):
         context = self.get_context(request)
         return render(request, self.template, context)
 
-class ArticlePage(Page):
-    article = models.ForeignKey('Article', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
-    
-    content_panels = Page.content_panels + [
-        FieldPanel('article'),
-    ]
-    
-
+@register_snippet
 class SiteHeaderFooter(models.Model):
     header_footer_content = StreamField([
-        ('policy_block',ListBlock(LinkBlock(required=False))),
-        ('social_media_block',ListBlock(IconBlock(required=False))),
-        ], max_num=7, use_json_field=True)
+        ('policy_block', ListBlock(LinkBlock(required=False))),
+        ('social_media_block', ListBlock(IconBlock(required=False))),
+    ], max_num=7, use_json_field=True)
 
     def __str__(self):
         return 'Header Footer Configuration'
     
-    # allow only one object
     def clean(self):
         if not self.pk and SiteHeaderFooter.objects.exists():
             raise ValidationError("We are Sorry! Only One Entry allowed!")
-        
 
 @register_setting
 class SiteConfiguration(BaseSiteSetting):
-    site_logo = models.ForeignKey('wagtailimages.Image',null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
-    site_favicon = models.ForeignKey('wagtailimages.Image',null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    site_logo = models.ForeignKey('wagtailimages.Image', null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    site_favicon = models.ForeignKey('wagtailimages.Image', null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     google_analytics_tag = models.CharField(max_length=300, blank=True)
     excluded_models_in_data_export = models.TextField(blank=True, verbose_name="excluded_models for archive", default='wagtailcore.modellogentry,wagtailcore.pagelogentry,wagtailcore.pagesubscription,admin.logentry,auth.permission,wagtailsearch.indexentry,wagtailcore.referenceindex,wagtailimages.rendition,contenttypes,sessions,wagtailcore.groupcollectionpermission')
 
     def __str__(self):
-        return 'Add Site Configuration'  
-    
-    
-class RedirectPage(Page):
-    is_creatable = settings.CAN_CONTENT_EDITOR_CREATE_THIS_PAGE
+        return 'Add Site Configuration'
 
-    """A page that redirects users to another page (internal or external)"""    
+class RedirectPage(Page):
+    # is_creatable = settings.CAN_CONTENT_EDITOR_CREATE_THIS_PAGE
+
     redirect_page = models.ForeignKey('wagtailcore.Page', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
     external_link = models.URLField(max_length=255, blank=True, null=True, help_text='Links to an external page?')
 
@@ -305,4 +285,55 @@ class RedirectPage(Page):
             FieldPanel('external_link'),
         ]),        
     ]
+ 
+class ShorohatPage(ListingPage):
+    template = 'app/audio_listing_page.html'
+    def get_items(self):
+        return Sharhu.objects.all()
+    
+class MohadaratPage(ListingPage):
+    template = 'app/audio_listing_page.html'
+    def get_items(self):
+        return Mohadarah.objects.all()
 
+class KhutabPage(ListingPage):
+    template = 'app/audio_listing_page.html'
+
+    def get_items(self):
+        return Khutbah.objects.all()
+    
+class SuwalaatPage(ListingPage):
+    template = 'app/audio_listing_page.html'    
+    def get_items(self):
+        return QATrack.objects.all()
+    
+class MotarjmatPage(ListingPage):
+    template = 'app/audio_listing_page.html'
+    def get_items(self):
+        return Motarjmah.objects.all()
+    
+class TilawatPage(ListingPage):
+    template = 'app/audio_listing_page.html'    
+    def get_items(self):
+        return Tilawah.objects.all()
+
+class HomePage(Page):
+    pass
+
+class ArticlesPage(ListingPage):
+    template = 'app/article_listing_page.html'
+    def get_items(self):
+        return Article.objects.all()
+    
+class AnnouncementsPage(ListingPage):
+    template = 'app/article_listing_page.html'
+    def get_items(self):
+        return Announcement.objects.all()
+    
+class BooksPage(ListingPage):
+    template = 'app/article_listing_page.html'
+    def get_items(self):
+        return Kitab.objects.all()
+    
+class ContactUsPage(Page):
+    pass

@@ -5,7 +5,7 @@ from wagtail import hooks
 
 from .models import (
     Khutbah, Mohadarah, Sharhu, Motarjmah, Tilawah, 
-    Book, Article, Announcement, SocialMedia
+    Kitab, Article, Announcement, SocialMedia
 )
 
 # Standard Django Admin Registration
@@ -53,7 +53,7 @@ class TilawahViewSet(SnippetViewSet):
     search_fields = ('title', 'surah')
 
 class BookViewSet(SnippetViewSet):
-    model = Book
+    model = Kitab
     menu_label = "Books"
     menu_icon = "book"
     list_display = ('title', 'author', 'publisher', 'publication_year', 'hits')

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Khutbah, Mohadarah, Sharhu, Motarjmah, Tilawah, Article, Announcement, Book
+from .models import Khutbah, Mohadarah, Sharhu, Motarjmah, Tilawah, Article, Announcement, Kitab
 from django.db import models
 
 # Create your views here.

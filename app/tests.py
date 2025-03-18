@@ -8,9 +8,9 @@ from wagtail.images.models import Image
 
 from .models import (
     Khutbah, Mohadarah, Sharhu, Motarjmah, Tilawah, 
-    Book, Article, Announcement, SocialMedia,
-    KhutbahListingPage, MohadarahListingPage, SharhuListingPage,
-    MotarjmahListingPage, TilawahListingPage, BookListingPage,
+    Kitab, Article, Announcement, SocialMedia,
+    KhutabPage, MohadaratPage, ShorohatPage,
+    MotarjmatPage, TilawatPage, BookListingPage,
     ArticleListingPage, AnnouncementListingPage
 )
 import base64
@@ -38,7 +38,7 @@ class BaseModelTestCase(TestCase):
         sharhu = Sharhu.objects.create(title=test_title, book_title="Test Book", date=test_date)
         motarjmah = Motarjmah.objects.create(title=test_title, date=test_date)
         tilawah = Tilawah.objects.create(title=test_title, date=test_date)
-        book = Book.objects.create(title=test_title, author="Test Author")
+        book = Kitab.objects.create(title=test_title, author="Test Author")
         article = Article.objects.create(title=test_title, date=test_date)
         
         # Test __str__ output
@@ -112,7 +112,7 @@ class ListingPageTests(WagtailPageTestCase):
         )
         
         # Create a listing page
-        self.khutbah_listing = KhutbahListingPage(
+        self.khutbah_listing = KhutabPage(
             title="Khutbah Listing",
             intro="<p>Browse our collection of khutbahs</p>"
         )
