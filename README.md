@@ -1,2 +1,2 @@
 # elbukhari
-elbukhari.com
+elbukhari
