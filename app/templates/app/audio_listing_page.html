@@ -8,25 +8,29 @@
                     <div class="pageHeader">
                         <h2>{{ page.title }}</h2>
                     </div>
-
-                    {% for item in items %}
-                      {% for block in item.media_content %}
-                        {% if block.block_type == 'audio' and block.value %}
-                            {% with  block.value.audio_file as aud %}
-                            <a href="{{ aud.url }}" class="audio-link">{{ item.title }} </a>
-                            <audio controls class="audio-player">
-                                <source src="{{ aud.url }}" type="{{ aud.file.content_type }}">>
-                            Your browser does not support the audio element.
-                            </audio>
-                            {% endwith %}
-                        {% endif %}                       
-                      {% endfor %}
-                
-                      <br>
-
-                    {% endfor %}
-                   
-                   <!-- add pagination -->
+                    <table class="audio-table">
+                        {% for item in items %}
+                        {% for block in item.media_content %}
+                          {% if block.block_type == 'audio' and block.value %}
+                              {% with block.value.audio_file as aud %}
+                              <tr class="audio-row">
+                                <td class="audio-cell audio-title-cell">
+                                    <a href="{{ aud.url }}" class="audio-link">{{ item.title }}</a>
+                                </td>
+                                <td class="audio-cell audio-player-cell">
+                                    <audio controls class="audio-player">
+                                        <source src="{{ aud.url }}" type="{{ aud.file.content_type }}">
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                </td>
+                              </tr>
+                              {% endwith %}
+                          {% endif %}                       
+                        {% endfor %}
+                        {% endfor %}
+                    </table>
+                    <!-- add pagination -->
+                     {% include "blocks/pagination_block.html" with items=items %}
                 </div>
             </div>
         </div>

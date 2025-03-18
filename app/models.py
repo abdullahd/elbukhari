@@ -222,7 +222,7 @@ class ListingPage(Page):
         context = super().get_context(request, *args, **kwargs)
         items = self.get_items()
         page = request.GET.get('page')
-        paginator = Paginator(items, 50)  # items per page
+        paginator = Paginator(items, 20)  # items per page
         try:
             items = paginator.page(page)
         except PageNotAnInteger:
